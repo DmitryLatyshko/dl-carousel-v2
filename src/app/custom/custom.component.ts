@@ -6,7 +6,7 @@ function randomNumber(min: number, max: number): number {
 }
 
 @Component({
-  selector: 'ngx-owl-carousel-o-page',
+  selector: 'custom-carousel-page',
   templateUrl: './custom.component.html',
   styleUrls: ['./custom.component.scss'],
 })
