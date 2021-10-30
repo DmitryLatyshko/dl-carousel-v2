@@ -1,0 +1,4 @@
+<ng-container *ngIf="loading; else dlCarouselItem">Loading...</ng-container>
+<ng-template #dlCarouselItem>
+  <img [src]="record.source" [alt]="record.alt" [title]="record.title" />
+</ng-template>

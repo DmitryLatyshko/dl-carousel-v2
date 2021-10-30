@@ -1,0 +1,18 @@
+<div
+  class="dl-carousel"
+  [ngClass]="{
+    'dl-carousel-drag': domData.isMouseDraggable,
+    'dl-carousel-grab': domData.isGrab
+  }"
+>
+  <dl-carousel-navigation [navigationData]="navigationData">
+    <div class="dl-carousel-stage-outer">
+      <dl-carousel-stage
+        [stageModel]="stageModel"
+        [slidesData]="slidesData"
+        [draggable]="domData"
+      >
+      </dl-carousel-stage>
+    </div>
+  </dl-carousel-navigation>
+</div>

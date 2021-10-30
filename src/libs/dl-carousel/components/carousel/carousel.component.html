@@ -1,0 +1,10 @@
+<ng-container *ngIf="loading; else container">Loading...</ng-container>
+<ng-template #container>
+  <dl-carousel-container [options]="options">
+    <ng-container *ngFor="let item of items">
+      <ng-template dlCarouselSlide [id]="item.id" [width]="options.slideWidth">
+        <dl-carousel-item-wrapper [record]="item"></dl-carousel-item-wrapper>
+      </ng-template>
+    </ng-container>
+  </dl-carousel-container>
+</ng-template>

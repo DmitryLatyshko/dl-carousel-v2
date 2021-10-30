@@ -1,0 +1,15 @@
+.dl-carousel-navigation {
+  // margin-top: 10px;
+  // text-align: center;
+  // -webkit-tap-highlight-color: transparent;
+
+  .dl-carousel-action {
+    &.hidden {
+      display: none;
+    }
+
+    &.disabled {
+      color: red;
+    }
+  }
+}

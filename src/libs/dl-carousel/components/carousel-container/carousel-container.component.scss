@@ -1,0 +1,25 @@
+.dl-carousel {
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 1;
+
+  &.dl-carousel-drag .dl-carousel-item {
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  &.dl-carousel-grab {
+    cursor: move;
+    cursor: grab;
+  }
+
+  .dl-carousel-stage-outer {
+    position: relative;
+    overflow: hidden;
+    -webkit-transform: translate3d(0px, 0px, 0px);
+  }
+}

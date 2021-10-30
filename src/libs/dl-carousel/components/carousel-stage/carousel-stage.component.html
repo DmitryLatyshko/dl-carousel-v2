@@ -1,0 +1,21 @@
+<div>
+  <div
+    class="dl-carousel-stage"
+    [ngStyle]="{
+      width: stageModel.width + 'px',
+      transform: stageModel.transform,
+      transition: stageModel.transition
+    }"
+  >
+    <ng-container *ngFor="let slide of slidesData; let i = index">
+      <div
+        class="dl-carousel-item"
+        [ngStyle]="{
+          width: slide.width + 'px'
+        }"
+      >
+        <ng-template [ngTemplateOutlet]="slide.tplRef"></ng-template>
+      </div>
+    </ng-container>
+  </div>
+</div>

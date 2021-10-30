@@ -1,0 +1,86 @@
+<div [ngClass]="{ 'dl-carousel-navigation': !navigationData.disabled }">
+  <ng-container [ngSwitch]="navigationData.navigationModel.position">
+    <ng-container *ngSwitchCase="storedNavigationPosition.Inner">
+      <span>Inner</span>
+      <ng-container
+        [ngTemplateOutlet]="inner_outer"
+        [ngTemplateOutletContext]="{ position: 'inner' }"
+      ></ng-container>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="storedNavigationPosition.Outer">
+      <span>Outer</span>
+      <ng-container
+        [ngTemplateOutlet]="inner_outer"
+        [ngTemplateOutletContext]="{ position: 'outer' }"
+      ></ng-container>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="storedNavigationPosition.Outside">
+      <span>Outside</span>
+      <ng-container [ngTemplateOutlet]="outside_default"></ng-container>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="storedNavigationPosition.Default">
+      <span>Default</span>
+      <ng-container [ngTemplateOutlet]="outside_default"></ng-container>
+    </ng-container>
+
+    <ng-container *ngSwitchDefault>
+      <span>ngSwitchDefault</span>
+      <ng-container [ngTemplateOutlet]="content"></ng-container>
+    </ng-container>
+  </ng-container>
+</div>
+
+<ng-template #content>
+  <ng-content></ng-content>
+</ng-template>
+
+<ng-template #inner_outer let-position="position">
+  <ng-container
+    [ngTemplateOutlet]="prevContainer"
+    [ngTemplateOutletContext]="{ position: position }"
+  ></ng-container>
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+  <ng-container
+    [ngTemplateOutlet]="nextContainer"
+    [ngTemplateOutletContext]="{ position: position }"
+  ></ng-container>
+</ng-template>
+
+<ng-template #outside_default>
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+  <ng-container
+    [ngTemplateOutlet]="prevContainer"
+    [ngTemplateOutletContext]="{ position: 'outside' }"
+  ></ng-container>
+  <ng-container
+    [ngTemplateOutlet]="nextContainer"
+    [ngTemplateOutletContext]="{ position: 'outside' }"
+  ></ng-container>
+</ng-template>
+
+<ng-template #prevContainer let-position="position">
+  <ng-container *ngIf="!navigationData.disabled">
+    <div
+      class="dl-carousel-action dl-carousel-prev"
+      [className]="position"
+      [ngClass]="{ disabled: navigationData.prevDisabled }"
+      (click)="prev()"
+      [innerHTML]="navigationData.navigationModel.prevHtmlText"
+    ></div>
+  </ng-container>
+</ng-template>
+
+<ng-template #nextContainer let-position="position">
+  <ng-container *ngIf="!navigationData.disabled">
+    <div
+      class="dl-carousel-action dl-carousel-next"
+      [className]="position"
+      [ngClass]="{ disabled: navigationData.nextDisabled }"
+      (click)="next()"
+      [innerHTML]="navigationData.navigationModel.nextHtmlText"
+    ></div>
+  </ng-container>
+</ng-template>

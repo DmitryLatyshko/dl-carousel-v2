@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { CustomPageComponent } from './custom.component';
+import { CarouselModule } from 'src/libs';
 
 const routes: Routes = [
   {
@@ -12,6 +12,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [CustomPageComponent],
-  imports: [CommonModule, RouterModule.forChild(routes)],
+  imports: [CarouselModule, RouterModule.forChild(routes)],
 })
 export class CustomModule { }
