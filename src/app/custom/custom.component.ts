@@ -16,7 +16,8 @@ export class CustomPageComponent {
     navigation: {
       navigation: true
     },
-    loop: true,
+    loop: false,
+    center: true,
     slideWidth: 200,
     mouseDrag: true,
     touchDrag: true,

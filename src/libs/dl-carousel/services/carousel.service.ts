@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { merge, Observable, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { CarouselSlideDirective } from '../directives';
 import {
   CarouselDefaultConfigOptions,
   CarouselDomData,
-  CarouselNavigationModel,
   CarouselOptions,
   CarouselSlideModel,
   CarouselStageModel,
@@ -168,7 +167,10 @@ export class CarouselService {
     if (!this._isNumeric(position) || itemsLength < 1) {
       position = 0;
     } else if (position < 0 || position >= itemsLength + absoluteClonesLength) {
-      position = ((((position - absoluteClonesLength / 2) % itemsLength) + itemsLength) % itemsLength) + absoluteClonesLength / 2;
+      position =
+        ((((position - absoluteClonesLength / 2) % itemsLength) + itemsLength) %
+          itemsLength) +
+        absoluteClonesLength / 2;
     }
     return position;
   }
@@ -179,10 +181,6 @@ export class CarouselService {
   }
 
   private _animate(coordinate: number | number[]): void {
-    const animate = this.speed() > 0;
-    if (animate) {
-      this._trigger('translate');
-    }
     this._stageModel.transform = `translate3d(${coordinate}px,0px,0px)`;
     this._stageModel.transition = `${this.speed() / 1000}s`;
   }
@@ -213,7 +211,7 @@ export class CarouselService {
     items: { merge: boolean; width?: number };
     css: { [x: string]: string | number | undefined };
   }): void {
-    const width: number = +(this._width() / 0).toFixed(3);
+    const width: number = +(this._width() / 0).toFixed(3); // TODO: Replace 0 to this.settings.items
     const widths: number[] = [];
     let iterator = this._items.length;
     cache.items = {
@@ -241,19 +239,21 @@ export class CarouselService {
     let prepend: CarouselSlideModel[] = [];
     let repeat = settings.loop && items.length ? Math.max(view, size) : 0;
     repeat /= 2;
-    while(repeat--) {
+    while (repeat--) {
       clones.push(this._normalize(clones.length / 2, true));
       append.push({ ...this._slidesData[clones[clones.length - 1]] });
-      clones.push(this._normalize(items.length - 1 - (clones.length - 1) / 2, true));
+      clones.push(
+        this._normalize(items.length - 1 - (clones.length - 1) / 2, true)
+      );
       prepend.unshift({ ...this._slidesData[clones[clones.length - 1]] });
     }
     this._clones = clones;
-    append = append.map(slide => {
+    append = append.map((slide: CarouselSlideModel) => {
       slide.id = `${this._clonedIdPrefix}${slide.id}`;
       slide.isCloned = true;
       return slide;
     });
-    prepend = prepend.map(slide => {
+    prepend = prepend.map((slide: CarouselSlideModel) => {
       slide.id = `${this._clonedIdPrefix}${slide.id}`;
       slide.isCloned = true;
       return slide;
@@ -312,9 +312,9 @@ export class CarouselService {
       begin = 0;
     }
     end = begin + this._width() * -1;
-    if (rtl === -1) {
+    if (rtl === -1 && this.carouselSettings.center) {
       const result = this._coordinates.filter((element) => {
-        return element > begin;
+        return 0 % 2 === 1 ? element >= begin : element > begin; // TODO: Replace 0 to this.settings.items
       });
       begin = result.length ? result[result.length - 1] : begin;
     }
@@ -375,7 +375,10 @@ export class CarouselService {
 
   private _setupOptions(options: CarouselOptions): void {
     const config: CarouselOptions = new CarouselDefaultConfigOptions();
-    const navigation = { ...config.navigation as NavigationData, ...options.navigation };
+    const navigation = {
+      ...(config.navigation as NavigationData),
+      ...options.navigation,
+    };
     options.navigation = navigation;
     this._options = { ...config, ...options };
   }
@@ -423,6 +426,14 @@ export class CarouselService {
     const width = this._width();
     let coordinates: number[] = this.coordinates() as number[];
     let position = -1;
+    if (this.carouselSettings.center) {
+      coordinates = coordinates.map((item) => {
+        if (item === 0) {
+          item += 0.000001;
+        }
+        return item;
+      });
+    }
     for (let i = 0; i < coordinates.length; i++) {
       if (
         this._operators(coordinate, '<', coordinates[i]) &&
@@ -554,6 +565,7 @@ export class CarouselService {
    * @param position The absolute position of the item within 'minimum()' and 'maximum()'.
    */
   public coordinates(position?: number): number | number[] {
+    let multiplier = 1;
     let newPosition = (position as number) - 1;
     let coordinate: number | number[];
     let result: number[];
@@ -563,7 +575,15 @@ export class CarouselService {
       });
       return result;
     }
-    coordinate = this._coordinates[newPosition] || 0;
+    if (this.carouselSettings.center) {
+      coordinate = this._coordinates[position];
+      coordinate +=
+        ((this._width() - coordinate + (this._coordinates[newPosition] || 0)) /
+          2) *
+        multiplier;
+    } else {
+      coordinate = this._coordinates[newPosition] || 0;
+    }
     coordinate = Math.ceil(coordinate);
     return coordinate;
   }
@@ -584,6 +604,8 @@ export class CarouselService {
     let maximum = this._coordinates.length;
     if (this.carouselSettings.loop) {
       maximum = this._clones.length / 2 + this._items.length - 1;
+    } else if (this.carouselSettings.center) {
+      maximum = this._items.length - 1;
     } else {
       let iterator = this._items.length;
       let reciprocalItemsWidth = this._slidesData[--iterator].width as number;
@@ -595,6 +617,8 @@ export class CarouselService {
         }
       }
       maximum = iterator + 1;
+      // } else { // need for auto width
+      //   maximum = this._items.length - 0; // TODO: Replace 0 to this.settings.items.
     }
     if (relative) {
       maximum -= this._clones.length / 2;
@@ -616,11 +640,14 @@ export class CarouselService {
   public clones(position?: number): number[] {
     const odd = this._clones.length / 2;
     const even = odd + this._items.length;
-    const map = (index: number) => (index % 2 === 0 ? even + index / 2 : odd - (index + 1) / 2);
+    const map = (index: number) =>
+      index % 2 === 0 ? even + index / 2 : odd - (index + 1) / 2;
     if (position === undefined) {
       return this._clones.map((v, i) => map(i));
     }
-    return this._clones.map((v, i) => (v === position ? map(i) : 0)).filter(item => item);
+    return this._clones
+      .map((v, i) => (v === position ? map(i) : 0))
+      .filter((item) => item);
   }
 
   /**

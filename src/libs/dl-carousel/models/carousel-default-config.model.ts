@@ -11,6 +11,7 @@ export class CarouselDefaultConfigOptions implements CarouselOptions {
     nextHtmlText: 'next',
   } as CarouselNavigationModel;
   loop: false;
+  center: false;
   slideWidth = 0;
 
   mouseDrag = true;
